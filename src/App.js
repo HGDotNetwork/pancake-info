@@ -100,7 +100,31 @@ function App() {
   const globalData = useGlobalData()
   const globalChartData = useGlobalChartData()
   const [latestBlock, headBlock] = useLatestBlocks()
-
+  let speed = 0
+  
+  if(latestBlock) {
+    const latestTime = parseInt(new Date().getTime()/1000)
+    let lastBlock = 0
+    let lastTime = 0
+    if(localStorage.getItem("lastBlock")){
+      speed = parseInt(localStorage.getItem("lastSpeed"))
+      lastBlock = parseInt(localStorage.getItem("lastBlock"))
+      lastTime = parseInt(localStorage.getItem("lastTime"))
+      const nowSpeed = (parseInt(latestBlock) - lastBlock) / (latestTime - lastTime)
+      if (nowSpeed > 0) { 
+        speed = nowSpeed
+        console.log("Sync speed:" + speed + " blocks/s")
+        localStorage.setItem("lastBlock", latestBlock)
+        localStorage.setItem("lastTime", latestTime)
+        localStorage.setItem("lastSpeed", speed)
+      }
+    }
+    else{
+      localStorage.setItem("lastBlock", latestBlock)
+      localStorage.setItem("lastTime", latestTime)
+      localStorage.setItem("lastSpeed", speed)
+    }
+  }
   // show warning
   const showWarning = headBlock && latestBlock ? headBlock - latestBlock > BLOCK_DIFFERENCE_THRESHOLD : false
 
@@ -110,7 +134,7 @@ function App() {
         {showWarning && (
           <WarningWrapper>
             <WarningBanner>
-              {`The data on this site has only synced to Binance Smart Chain block ${latestBlock} (out of ${headBlock}). Please check back soon.`}
+              {`Synced to Binance Smart Chain block ${latestBlock} (out of ${headBlock}) at (${speed} blocks/s). Please check back soon.`}
             </WarningBanner>
           </WarningWrapper>
         )}

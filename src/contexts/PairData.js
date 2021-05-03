@@ -182,7 +182,7 @@ export default function Provider({ children }) {
   )
 }
 
-async function getBulkPairData(pairList, ethPrice) {
+async function getBulkPairData(pairList, bnbPrice) {
   const [t1, t2, tWeek] = getTimestampsForChanges()
   let [{ number: b1 }, { number: b2 }, { number: bWeek }] = await getBlocksFromTimestamps([t1, t2, tWeek])
 
@@ -245,7 +245,7 @@ async function getBulkPairData(pairList, ethPrice) {
             })
             oneWeekHistory = newData.data.pairs[0]
           }
-          data = parseData(data, oneDayHistory, twoDayHistory, oneWeekHistory, ethPrice, b1)
+          data = parseData(data, oneDayHistory, twoDayHistory, oneWeekHistory, bnbPrice, b1)
           return data
         })
     )
@@ -255,7 +255,7 @@ async function getBulkPairData(pairList, ethPrice) {
   }
 }
 
-function parseData(data, oneDayData, twoDayData, oneWeekData, ethPrice, oneDayBlock) {
+function parseData(data, oneDayData, twoDayData, oneWeekData, bnbPrice, oneDayBlock) {
   // get volume changes
   const [oneDayVolumeUSD, volumeChangeUSD] = get2DayPercentChange(
     data?.volumeUSD,
@@ -277,7 +277,7 @@ function parseData(data, oneDayData, twoDayData, oneWeekData, ethPrice, oneDayBl
   data.volumeChangeUntracked = volumeChangeUntracked
 
   // set liquiditry properties
-  data.trackedReserveUSD = data.trackedReserveETH * ethPrice
+  data.trackedReserveUSD = data.trackedReserveBNB * bnbPrice
   data.liquidityChangeUSD = getPercentChange(data.reserveUSD, oneDayData?.reserveUSD)
 
   // format if pair hasnt existed for a day or a week
@@ -459,7 +459,7 @@ const getHourlyRateData = async (pairAddress, startTime, latestBlock) => {
 
 export function Updater() {
   const [, { updateTopPairs }] = usePairDataContext()
-  const [ethPrice] = useEthPrice()
+  const [bnbPrice] = useEthPrice()
   useEffect(() => {
     async function getData() {
       // get top pairs by reserves
@@ -476,11 +476,11 @@ export function Updater() {
       })
 
       // get data for every pair in list
-      let topPairs = await getBulkPairData(formattedPairs, ethPrice)
+      let topPairs = await getBulkPairData(formattedPairs, bnbPrice)
       topPairs && updateTopPairs(topPairs)
     }
-    ethPrice && getData()
-  }, [ethPrice, updateTopPairs])
+    bnbPrice && getData()
+  }, [bnbPrice, updateTopPairs])
   return null
 }
 
@@ -513,7 +513,7 @@ export function useHourlyRateData(pairAddress, timeWindow) {
  */
 export function useDataForList(pairList) {
   const [state] = usePairDataContext()
-  const [ethPrice] = useEthPrice()
+  const [bnbPrice] = useEthPrice()
 
   const [stale, setStale] = useState(false)
   const [fetched, setFetched] = useState([])
@@ -544,15 +544,15 @@ export function useDataForList(pairList) {
         unfetched.map((pair) => {
           return pair
         }),
-        ethPrice
+        bnbPrice
       )
       setFetched(newFetched.concat(newPairData))
     }
-    if (ethPrice && pairList && pairList.length > 0 && !fetched && !stale) {
+    if (bnbPrice && pairList && pairList.length > 0 && !fetched && !stale) {
       setStale(true)
       fetchNewPairData()
     }
-  }, [ethPrice, state, pairList, stale, fetched])
+  }, [bnbPrice, state, pairList, stale, fetched])
 
   let formattedFetch =
     fetched &&
@@ -568,20 +568,20 @@ export function useDataForList(pairList) {
  */
 export function usePairData(pairAddress) {
   const [state, { update }] = usePairDataContext()
-  const [ethPrice] = useEthPrice()
+  const [bnbPrice] = useEthPrice()
   const pairData = state?.[pairAddress]
 
   useEffect(() => {
     async function fetchData() {
       if (!pairData && pairAddress) {
-        let data = await getBulkPairData([pairAddress], ethPrice)
+        let data = await getBulkPairData([pairAddress], bnbPrice)
         data && update(pairAddress, data[0])
       }
     }
-    if (!pairData && pairAddress && ethPrice && isAddress(pairAddress)) {
+    if (!pairData && pairAddress && bnbPrice && isAddress(pairAddress)) {
       fetchData()
     }
-  }, [pairAddress, pairData, update, ethPrice])
+  }, [pairAddress, pairData, update, bnbPrice])
 
   return pairData || {}
 }

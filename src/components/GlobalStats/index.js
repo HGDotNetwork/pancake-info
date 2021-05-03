@@ -27,8 +27,8 @@ export default function GlobalStats() {
   const [, setShowPriceCard] = useState(false)
 
   const { oneDayVolumeUSD, oneDayTxns, pairCount } = useGlobalData()
-  const [ethPrice] = useEthPrice()
-  const formattedEthPrice = ethPrice ? formattedNum(ethPrice, true) : '-'
+  const [bnbPrice] = useEthPrice()
+  const formattedEthPrice = bnbPrice ? formattedNum(bnbPrice, true) : '-'
   const oneDayFees = oneDayVolumeUSD ? formattedNum(oneDayVolumeUSD * 0.002, true) : ''
 
   return (
