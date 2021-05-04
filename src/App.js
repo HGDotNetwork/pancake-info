@@ -107,7 +107,7 @@ function App() {
     let lastBlock = 0
     let lastTime = 0
     if(localStorage.getItem("lastBlock")){
-      speed = parseInt(localStorage.getItem("lastSpeed"))
+      speed = new Number(localStorage.getItem("lastSpeed")).toFixed(2)
       lastBlock = parseInt(localStorage.getItem("lastBlock"))
       lastTime = parseInt(localStorage.getItem("lastTime"))
       const nowSpeed = (parseInt(latestBlock) - lastBlock) / (latestTime - lastTime)
