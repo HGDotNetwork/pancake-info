@@ -20,7 +20,7 @@ export const healthClient = new ApolloClient({
 
 export const blockClient = new ApolloClient({
   link: new HttpLink({
-    uri: 'https://pqsv.hg.network/subgraphs/name/pancakeswap/blocks',
+    uri: 'https://pq.hg.network/subgraphs/name/pancakeswap/blocks',
   }),
   cache: new InMemoryCache(),
 })
